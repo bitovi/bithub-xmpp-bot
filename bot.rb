@@ -39,7 +39,7 @@ module Bot
 end
 
 EM.run do
-  connection = AMQP.connect(ENV['MSQ_QUEUE']) do |connection|
+  AMQP.connect(ENV['MSQ_QUEUE']) do |connection|
     channel  = AMQP::Channel.new(connection)
     queue = channel.queue("q.events.xmpp-bot").bind("e.events")
     queue.subscribe do |metadata, payload|
