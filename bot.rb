@@ -15,7 +15,7 @@ module Bot
   setup ENV['JID'], ENV['JPASSWORD']
 
   when_ready do
-    puts "Connected ! send messages to #{jid.stripped}."
+    $log.info "Connected ! send messages to #{jid.stripped}."
     write_to_stream Blather::Stanza::Presence::Status.new(:available, "Feeding you updates since 1908!")
   end
 
@@ -46,13 +46,14 @@ EM.run do
       # $log.info payload.inspect
       Bot.say_to_roster payload
     end
-  end
 
-  EM.next_tick do
-    Bot.run
-  end
+    EM.next_tick do
+      Bot.run
+    end
 
-  stop = proc { puts "Terminating the XMPP bot"; connection.close { EM.stop } }
-  Signal.trap("INT",  &stop)
-  Signal.trap("TERM", &stop)
+    stop = proc { puts "Terminating the XMPP bot"; connection.close { EM.stop } }
+    Signal.trap("INT",  &stop)
+    Signal.trap("TERM", &stop)
+
+  end
 end
