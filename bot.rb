@@ -2,6 +2,7 @@ require 'rubygems'
 require 'amqp'
 require 'blather/client/dsl'
 require 'log4r'
+require 'yajl'
 
 # Logging
 $log = Log4r::Logger.new('jabber-client')
@@ -32,8 +33,9 @@ module Bot
   end
 
   def self.say_to_roster(payload)
+    msg = Yajl::Parser.parse(payload)
     my_roster.items.each do |item|
-      say item[0], payload
+      say item[0], "#{msg['actor']} : #{msg['title']}"
     end
   end
 end
@@ -44,7 +46,9 @@ EM.run do
     queue = channel.queue("q.events.xmpp-bot").bind("e.events")
     queue.subscribe do |metadata, payload|
       # $log.info payload.inspect
-      Bot.say_to_roster payload
+      EM.defer do
+        Bot.say_to_roster payload
+      end
     end
 
     EM.next_tick do
