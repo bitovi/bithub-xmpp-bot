@@ -1,1 +1,1 @@
-xmpp_bot: ruby bot.rb
+xmpp_bot: ruby app/xmpp_bot.rb

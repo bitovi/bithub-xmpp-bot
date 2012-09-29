@@ -5,10 +5,13 @@ require 'log4r'
 require 'yajl'
 
 # Logging
-$log = Log4r::Logger.new('jabber-client')
+$log = Log4r::Logger.new('XMPP-bot')
 $log.add(Log4r::StdoutOutputter.new('console', {
   :formatter => Log4r::PatternFormatter.new(:pattern => "[#{Process.pid}:%l] %d :: %m")
 }))
+
+# RabbitMQ connection string
+$mq_cs = ENV['MSGQ']
 
 module Bot
   extend Blather::DSL
@@ -22,13 +25,11 @@ module Bot
 
   # Auto approve subscription requests
   subscription :request? do |s|
-    # $log.info s.inspect
     write_to_stream s.approve!
   end
 
   # Echo back what was said
   message :chat?, :body do |m|
-    # $log.info m.body.inspect
     say m.from, "You said: #{m.body}"
   end
 
@@ -41,11 +42,10 @@ module Bot
 end
 
 EM.run do
-  AMQP.connect(ENV['MSQ_QUEUE']) do |connection|
+  AMQP.connect($mq_cs) do |connection|
     channel  = AMQP::Channel.new(connection)
     queue = channel.queue("q.events.xmpp-bot").bind("e.events")
     queue.subscribe do |metadata, payload|
-      # $log.info payload.inspect
       EM.defer do
         Bot.say_to_roster payload
       end
