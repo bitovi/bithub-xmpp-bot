@@ -58,6 +58,5 @@ EM.run do
     stop = proc { puts "Terminating the XMPP bot"; connection.close { EM.stop } }
     Signal.trap("INT",  &stop)
     Signal.trap("TERM", &stop)
-
   end
 end
