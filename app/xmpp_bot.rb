@@ -39,9 +39,7 @@ module Bot
     my_roster.items.each do |item|
 
       body = <<-body
-<body>
 #{json['actor']} : #{json['title']} : #{json['feed'].upcase} : #{json['link']}
-</body>
       body
 
       xhtml = <<-xhtml
