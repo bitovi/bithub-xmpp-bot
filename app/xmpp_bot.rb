@@ -30,8 +30,7 @@ module Bot
 
   # Echo back what was said
   message :chat?, :body do |m|
-
-
+    say m.from, "No need in sending me messages. I'm the one talking here."
   end
 
   def self.say_to_roster(payload)
